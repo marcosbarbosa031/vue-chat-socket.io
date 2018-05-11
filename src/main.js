@@ -3,15 +3,16 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
-import socketio from 'socket.io-client'
-import VueSocketIO from 'vue-socket.io';
+// import socketio from 'socket.io-client'
+// import VueSocketIO from 'vue-socket.io';
 import store from './store'
 import UUID from 'vue-uuid'
 
-export const SocketInstance = socketio('http://localhost:4113');
+// export const SocketInstance = socketio('http://localhost:5000');
 
-Vue.use(VueSocketIO, SocketInstance, UUID)
-
+// Vue.use(VueSocketIO, SocketInstance, UUID)
+Vue.use(UUID)
+// 
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

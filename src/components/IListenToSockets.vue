@@ -11,6 +11,7 @@
 
 <script>
 import { uuid } from 'vue-uuid'
+import socketio from 'socket.io-client'
 
 export default {
   data() {
@@ -19,35 +20,38 @@ export default {
       socketMessage: [],
       inputText: '',
       userId: '',
-    }
-  },
-
-  sockets: {
-    connect() {
-      // Fired when the socket connects.
-      console.log('Conectou')
-      this.isConnected = true;
-    },
-
-    disconnect() {
-      this.isConnected = false;
-    },
-
-    // Fired when the server sends something on the "messageChannel" channel.
-
-    chatMessage(data) {
-      this.socketMessage.push(data)
+      socket: null
     }
   },
 
   methods: {
+    connectSocker () {
+      let socket = socketio('http://localhost:5000')
+      this.socket = socket
+
+      let data = {
+        session: 'dad7f362-2c09-4398-83a7-9529e44f407d',
+        name: 'Eu carai'
+      }
+
+      this.socket.emit('join', data)
+
+      this.isConnected = true;
+
+      this.socket.on('chatMessage', msg => {
+        console.log('msg: ', msg)
+        console.log('socketMessage: ', this.socketMessage)
+        this.socketMessage.push(msg)
+      })
+
+    },
     sendMessage() {
       // Send the "pingServer" event to the server.
       let data = {
         userId: this.userId,
         message: this.inputText
       }
-      this.$socket.emit('chatMessage', data)
+      this.socket.emit('chatMessage', data)
       this.inputText = ''
     }
   },
@@ -55,6 +59,10 @@ export default {
   beforeMount () {
     this.userId = uuid.v4()
     console.log('userId :', this.userId)
+  },
+
+  mounted () {
+    this.connectSocker()
   }
 }
 </script>
