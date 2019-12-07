@@ -26,7 +26,7 @@ export default {
 
   methods: {
     connectSocker () {
-      let socket = socketio('http://localhost:5000')
+      let socket = socketio('http://localhost:4113')
       this.socket = socket
 
       let data = {
@@ -46,7 +46,6 @@ export default {
 
     },
     sendMessage() {
-      // Send the "pingServer" event to the server.
       let data = {
         userId: this.userId,
         message: this.inputText
