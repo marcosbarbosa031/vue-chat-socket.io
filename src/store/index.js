@@ -5,33 +5,44 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    isConnected: false,
-    socketMessage: ''
+    user: {
+      userId: null,
+      username: ''
+    }
   },
 
   mutations: {
-    SOCKET_CONNECT(state) {
-      state.isConnected = true;
+    SET_USERNAME(state, username) {
+      state.user.username = username;
     },
 
-    SOCKET_DISCONNECT(state) {
-      state.isConnected = false;
-    },
-
-    SOCKET_USER_MESSAGE(state, message) {
-      state.socketMessage = message
+    SET_USER_ID(state, userId) {
+      state.user.userId = userId;
     }
   },
+
+  getters: {
+    getUserId: state => {
+      return state.user.userId;
+    },
+
+    getUsername: state => {
+      return state.user.username;
+    }
+  },
+
   actions: {
     otherAction: (context, type) => {
       return true;
     },
-    socket_userMessage: (context, message) => {
-      context.dispatch('newMessage', message);
-      context.commit('SOCKET_USER_MESSAGE', message);
-      if (message.is_important) {
-        context.dispatch('alertImportantMessage', message);
-      }
+
+    set_username: (context, username) => {
+      context.commit('SET_USERNAME', username);
+    },
+
+    set_user_id: (context, userId) => {
+      context.commit('SET_USER_ID', userId);
     }
+
   }
 })
