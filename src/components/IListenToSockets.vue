@@ -20,8 +20,13 @@
             </div>
 
             <!-- User Message -->
-            <div class="user-msg msg-left" v-if="!message.server && message.userId !== userId">
-              <p>{{ message.username | capitalize }}: {{ message.message }}</p>
+            <div v-if="!message.server && message.userId !== userId">
+              <div class="user-left-name">
+                {{message.username | capitalize}}
+              </div>
+              <div class="user-msg msg-left">
+                <p>{{ message.message }}</p>
+              </div>
             </div>
 
             <div class="user-msg msg-right" v-if="!message.server && message.userId === userId">
@@ -31,7 +36,7 @@
         </div>
 
         <!-- input -->
-        <form class="message-input" action="" @submit.prevent="sendMessage">
+        <form class="message-input" action="" @submit.prevent="sendMessage" autocomplete="off">
           <input class="mr-10 w-85" type="text" name="message" v-model="inputText" />
           <button class="w-15">Send</button>
         </form>
@@ -105,7 +110,6 @@ export default {
         message: this.inputText,
         server: false
       };
-      console.log("data: ", data);
       this.socket.emit("chatMessage", data);
       this.inputText = "";
     },
@@ -209,6 +213,13 @@ export default {
     height: 5%;
   }
 
+  .message-input input {
+    border-radius: 20px;
+    border: 1px solid #b7b7b7;
+    outline: none;
+    padding: 0 14px;
+  }
+
   .user-row {
     border-bottom: 1px solid #cfcfcf;
   }
@@ -238,5 +249,16 @@ export default {
   .user-msg {
     padding: 0 20px;
     border-radius: 30px;
+  }
+
+  .user-left-name {
+    position: relative;
+    top: 13px;
+    left: 6px;
+    background: #1f9cf4;
+    color: white;
+    padding: 0 10px;
+    border-radius: 10px;
+    display: table;
   }
 </style>
