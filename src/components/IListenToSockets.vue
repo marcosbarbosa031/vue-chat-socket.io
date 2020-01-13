@@ -68,7 +68,7 @@ export default {
 
   methods: {
     connectSocker() {
-      let socket = socketio("http://localhost:4113");
+      let socket = socketio("http://localhost:3000");
       this.socket = socket;
 
       let user = {
