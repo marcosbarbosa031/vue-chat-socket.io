@@ -68,7 +68,8 @@ export default {
 
   methods: {
     connectSocker() {
-      let socket = socketio("http://localhost:3000");
+      let port = process.env.PORT || 3000;
+      let socket = socketio(`https://vue-chat-online.herokuapp.com/`);
       this.socket = socket;
 
       let user = {
