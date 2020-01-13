@@ -4,7 +4,7 @@
     <div class="chat-container">
       <!-- Users -->
       <div class="chatbox-card mr-10px w-30">
-        <div class="user-row p-20" v-for="user in users" :key="user.userId">
+        <div class="user-row p-20" v-bind:class="{ mainuser: isMainUser(user) }" v-for="user in users" :key="user.userId">
           <div class="user-icon"></div>
           <div class="username">{{user.username | capitalize}}</div>
         </div>
@@ -61,7 +61,8 @@ export default {
       userId: "",
       username: "",
       users: [],
-      socket: null
+      socket: null,
+      isActive: true
     };
   },
 
@@ -82,7 +83,7 @@ export default {
         this.socket.emit('leave', user);
       }
 
-      this.socket.emit("join", user);
+      this.socket.emit("joinMain", user);
 
       this.socket.on("chatMessage", message => {
         console.log("message: ", message);
@@ -136,6 +137,10 @@ export default {
     async scrollDown() {
       let chat = document.getElementById("chat");
       setTimeout(() => { chat.scrollTop = chat.scrollHeight; }, 100);
+    },
+
+    isMainUser(user) {
+      return user.userId === this.userId;
     }
   },
 
@@ -224,6 +229,11 @@ export default {
     border-bottom: 1px solid #cfcfcf;
   }
 
+  .mainuser {
+    background: #1f9cf4;
+    color: white;
+  }
+
   .msg-holder {
     display: flow-root;
     padding: 5px 0;
@@ -249,6 +259,7 @@ export default {
   .user-msg {
     padding: 0 20px;
     border-radius: 30px;
+    max-width: 80%;
   }
 
   .user-left-name {
