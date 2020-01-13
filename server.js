@@ -10,13 +10,16 @@ var users = [];
 
 io.on('connection', function (socket) {
   socket.on('join', user => {
-    if (!users.some(u => u.userId === user.userId)) {
+    if ((!users.some(u => u.userId === user.userId)) && user.username !== '') {
       console.log(`${user.username} joined the chat`)
       socket.broadcast.emit('chatMessage', {
         message: `${user.username} joined the chat`,
         server: true
       });
+
       users.push(user);
+
+      io.emit('updateUsers', users);
       
       users.forEach(u => {
         console.log('Users: ', u.username, '   Id: ', u.userId);
@@ -36,7 +39,9 @@ io.on('connection', function (socket) {
 
   socket.on('leave', user => {
     console.log(`${user.username} left the chat.`);
+    users.splice(users.indexOf(u => u.userId === user.userId), 1);
     socket.broadcast.emit('userDisconnected', {
+      user: user,
       message: `${user.username} left the chat.`,
       server: true
     })
