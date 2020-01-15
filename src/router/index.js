@@ -8,14 +8,10 @@ Vue.use(Router)
 export default new Router({
   routes: [
     {
-      path: '/chat',
-      name: 'IListenToSockets',
-      component: IListenToSockets
-    },
-    {
       path: '/',
-      name: 'Home',
-      component: Home
+      name: 'IListenToSockets',
+      component: IListenToSockets,
+      mode: history
     }
   ]
 })

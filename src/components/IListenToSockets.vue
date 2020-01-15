@@ -1,7 +1,10 @@
 <template>
+
   <div class="chat">
 
-    <div class="chat-container">
+    <home-component v-if="isHome"></home-component>
+
+    <div v-if="!isHome" class="chat-container">
       <div class="chat-header">
         <div class="tab-chat">
           <div class="tab-txt tab-selected">Global</div>
@@ -14,6 +17,10 @@
       <div class="chat-body">
         <!-- Users -->
         <div class="chatbox-card w-30">
+          <div class="user-row p-20">
+            <div class="users-txt">Users</div>
+          </div>
+
           <div class="user-row p-20" v-bind:class="{ mainuser: isMainUser(user) }" v-for="user in users" :key="user.userId">
             <div class="user-icon"></div>
             <div class="username">{{user.username | capitalize}}</div>
@@ -65,8 +72,14 @@
 <script>
 import socketio from "socket.io-client";
 import { uuid } from "vue-uuid";
+import Home from "./Home";
+import { mapState } from "vuex";
 
 export default {
+  name: "Chat",
+  components: {
+    'home-component': Home
+  },
   data() {
     return {
       isConnected: false,
@@ -81,9 +94,9 @@ export default {
   },
 
   methods: {
-    connectSocker() {
-        this.socket = socketio("https://vue-chat-online.herokuapp.com/");
-        // this.socket = socketio("http://localhost:3000");
+    connectSocket() {
+        // this.socket = socketio("https://vue-chat-online.herokuapp.com/");
+        this.socket = socketio("http://localhost:3000");
 
       let user = {
         userId: this.userId,
@@ -107,14 +120,14 @@ export default {
 
       this.socket.on('userDisconnected', message => {
         console.log("message disconnect: ", message);
-        this.removeUser(user);
+        this.removeUser(user.userId);
         this.userMessages.push(message);
         console.log('users: ', this.users);
       });
 
       this.socket.on('updateUsers', users => {
-        console.log('users: ', users);
-        this.users = users;
+        console.log('usersUpdate: ', users);
+        this.users = this.formatUsersArray(users);
       })
     },
 
@@ -131,13 +144,8 @@ export default {
       }
     },
 
-    checkLocalStorage() {
-      if (this.$store.getters.getUsername) {
-        this.username = this.$store.getters.getUsername;
-        this.userId = this.$store.getters.getUserId;
-      } else {
-        this.$router.push({ path: "/" });
-      }
+    getUsername() {
+      this.username = this.$store.getters.getUsername;
     },
 
     generateUuid() {
@@ -146,8 +154,8 @@ export default {
       console.log("userId :", this.userId);
     },
 
-    removeUser(user) {
-      this.users.splice(this.users.indexOf(u => u.userId === user.userId), 1);
+    removeUser(userId) {
+      this.users.splice(this.users.findIndex(u => u.userId === userId), 1);
     },
 
     async scrollDown() {
@@ -157,17 +165,28 @@ export default {
 
     isMainUser(user) {
       return user.userId === this.userId;
+    },
+
+    formatUsersArray(users) {
+      users.splice(users.findIndex(u => u.userId === this.userId), 1);
+      return users;
+    },
+  },
+
+  computed: mapState(['isHome']),
+
+  watch: {
+    isHome(newValue, oldValue) {
+      console.log(`Old: ${oldValue}, new: ${newValue}`);
+
+      if (!newValue) {
+        this.generateUuid();
+        this.getUsername();
+        this.connectSocket();
+      }
     }
   },
 
-  beforeMount() {
-    this.generateUuid();
-    this.checkLocalStorage();
-  },
-
-  mounted() {
-    this.connectSocker();
-  },
 };
 </script>
 
@@ -230,14 +249,14 @@ export default {
   }
 
   .message-container {
-    height: 88%;
+    height: 85%;
     padding: 10px 20px;
     overflow: auto;
   }
 
   .message-input{
     display: flex;
-    height: calc(12% - 20px);
+    height: calc(15% - 20px);
     border-top: 1px solid #e4e4e4;
   }
 
@@ -287,7 +306,7 @@ export default {
   }
 
   .user-msg {
-    padding: 10px 20px;
+    padding: 15px 20px 10px 20px;
     border-radius: 30px;
     max-width: 80%;
     font-size: 14px;
@@ -337,5 +356,10 @@ export default {
 
   .send-btn img {
     width: 40px;
+  }
+
+  .users-txt {
+    font-size: 18px;
+    text-align: center;
   }
 </style>

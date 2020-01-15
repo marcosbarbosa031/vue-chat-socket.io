@@ -8,9 +8,18 @@ export default new Vuex.Store({
     user: {
       userId: null,
       username: ''
-    }
+    },
+    isHome: true
   },
 
+  getters: {
+    getUserId: state => state.user.userId,
+
+    getUsername: state => state.user.username,
+
+    getIsHome: state => state.isHome
+  },
+  
   mutations: {
     SET_USERNAME(state, username) {
       state.user.username = username;
@@ -18,18 +27,13 @@ export default new Vuex.Store({
 
     SET_USER_ID(state, userId) {
       state.user.userId = userId;
-    }
-  },
-
-  getters: {
-    getUserId: state => {
-      return state.user.userId;
     },
 
-    getUsername: state => {
-      return state.user.username;
+    SET_IS_HOME(state, home) {
+      state.isHome = home;
     }
   },
+
 
   actions: {
     otherAction: (context, type) => {
@@ -42,6 +46,10 @@ export default new Vuex.Store({
 
     set_user_id: (context, userId) => {
       context.commit('SET_USER_ID', userId);
+    },
+
+    set_is_home: (context, home) => {
+      context.commit('SET_IS_HOME', home);
     }
 
   }
