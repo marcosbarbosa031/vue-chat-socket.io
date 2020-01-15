@@ -95,7 +95,6 @@ export default {
 
   methods: {
     connectSocket() {
-      console.log('env: ', process.env.URL);
       this.socket = socketio(process.env.URL);
 
       let user = {
@@ -106,27 +105,22 @@ export default {
 
       window.onbeforeunload = () => {
         this.removeUser(user);
-        console.log('users: ', this.users);
         this.socket.emit('leave', user);
       }
 
       this.socket.emit("joinMain", user);
 
       this.socket.on("chatMessage", message => {
-        console.log("message: ", message);
         this.userMessages.push(message);
         this.scrollDown();
       });
 
       this.socket.on('userDisconnected', message => {
-        console.log("message disconnect: ", message);
-        this.removeUser(user.userId);
+        this.removeUser(message.user.userId);
         this.userMessages.push(message);
-        console.log('users: ', this.users);
       });
 
       this.socket.on('updateUsers', users => {
-        console.log('usersUpdate: ', users);
         this.users = this.formatUsersArray(users);
       })
     },
@@ -151,7 +145,6 @@ export default {
     generateUuid() {
       this.userId = uuid.v4();
       this.$store.dispatch("set_user_id", this.userId);
-      console.log("userId :", this.userId);
     },
 
     removeUser(userId) {
@@ -177,8 +170,6 @@ export default {
 
   watch: {
     isHome(newValue, oldValue) {
-      console.log(`Old: ${oldValue}, new: ${newValue}`);
-
       if (!newValue) {
         this.generateUuid();
         this.getUsername();
