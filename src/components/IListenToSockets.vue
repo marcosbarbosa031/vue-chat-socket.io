@@ -95,8 +95,12 @@ export default {
 
   methods: {
     connectSocket() {
-        // this.socket = socketio("https://vue-chat-online.herokuapp.com/");
+      console.log('env: ', process.env.URL);
+      if (process.env.URL) {
+        this.socket = socketio("https://vue-chat-online.herokuapp.com");
+      } else {
         this.socket = socketio("http://localhost:3000");
+      }
 
       let user = {
         userId: this.userId,
