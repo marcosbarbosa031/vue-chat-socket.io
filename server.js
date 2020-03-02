@@ -9,14 +9,19 @@ app.use(serveStatic(path.join(__dirname, 'dist')));
 var users = [];
 
 io.on('connection', function (socket) {
-  socket.on('join', user => {
-    if (!users.some(u => u.userId === user.userId)) {
-      console.log(`${user.username} joined the chat`)
-      socket.broadcast.emit('chatMessage', {
+  socket.on('joinMain', user => {
+    if ((!users.some(u => u.userId === user.userId)) && user.username !== '') {
+      console.log(`${user.username} joined the chat`);
+      socket.join('chatroom');
+
+      socket.broadcast.to('chatroom').emit('chatMessage', {
         message: `${user.username} joined the chat`,
         server: true
       });
+
       users.push(user);
+
+      io.to('chatroom').emit('updateUsers', users);
       
       users.forEach(u => {
         console.log('Users: ', u.username, '   Id: ', u.userId);
@@ -24,9 +29,18 @@ io.on('connection', function (socket) {
     }
   });
 
+  socket.on('joinPrivate', (user, sessionId) => {
+    socket.join(sessionId);
+
+    socket.broadcast.to(sessionId).emit('chatMessage', {
+      message: `${user.username} joined the chat`,
+      server: true
+    });
+  });
+
   socket.on('chatMessage', msg => {
     console.log(`${msg.username}: `, msg.message);
-    io.emit('chatMessage', msg);
+    io.to('chatroom').emit('chatMessage', msg);
   });
 
   // socket.on('disconnect', reason => {
@@ -36,13 +50,16 @@ io.on('connection', function (socket) {
 
   socket.on('leave', user => {
     console.log(`${user.username} left the chat.`);
-    socket.broadcast.emit('userDisconnected', {
+    users.splice(users.indexOf(u => u.userId === user.userId), 1);
+    socket.broadcast.to('chatroom').emit('userDisconnected', {
+      user: user,
       message: `${user.username} left the chat.`,
       server: true
-    })
+    });
+    socket.leave('chatroom');
   })
 });
 
-http.listen(4113, function () {
-  console.log('listening on *:4113');
+http.listen(process.env.PORT || 3000, function () {
+  console.log('listening on *:3000');
 });
