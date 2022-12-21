@@ -12,7 +12,7 @@
   "dependencies": {
     "express": "^4.17.3",
     "material-icons": "^0.3.1",
-    "node-sass": "^4.13.0",
+    "node-sass": "^8.0.0",
     "nodemon": "^2.0.2",
     "sass-loader": "^8.0.1",
     "socket.io": "^2.5.0",
